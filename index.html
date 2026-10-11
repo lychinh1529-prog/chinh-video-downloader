@@ -51,7 +51,6 @@ footer { text-align: center; color: #475569; font-size: 12px; margin-top: 15px; 
     </div>
 
     <div class="input-group">
-      <!-- Thêm maxlength="500" để chặn cứng không cho nhập/dán quá 500 ký tự -->
       <textarea id="link" maxlength="500" placeholder="Dán liên kết tại đây..." oninput="updateCount()"></textarea>
       <button class="btn-paste" onclick="pasteLink()">Dán</button>
     </div>
@@ -90,9 +89,7 @@ function updateCount() {
 async function pasteLink() {
   try {
     let text = await navigator.clipboard.readText();
-    if (text.length > 500) {
-      text = text.substring(0, 500); // Cắt bớt nếu quá 500 ký tự
-    }
+    if (text.length > 500) text = text.substring(0, 500);
     document.getElementById("link").value = text;
     updateCount();
   } catch (err) {
@@ -133,23 +130,30 @@ async function analyze() {
 
     if (data && data.code === 0 && data.data) {
       const v = data.data;
-      document.getElementById("videoPlayer").src = v.hdplay || v.play;
+      const videoSrc = v.hdplay || v.play;
+
+      if (!videoSrc) {
+        result.textContent = "Lỗi: Máy chủ không tìm thấy đường dẫn tệp video.";
+        return;
+      }
+
+      document.getElementById("videoPlayer").src = videoSrc;
       document.getElementById("authorAvatar").src = v.author?.avatar || "";
-      document.getElementById("authorName").textContent = v.author?.nickname || "Tác giả";
+      document.getElementById("authorName").textContent = v.author?.nickname || "Tác giả Douyin";
       document.getElementById("vTitle").textContent = v.title || "";
       
-      document.getElementById("btnHD").href = v.hdplay || v.play;
-      document.getElementById("btnSD").href = v.play;
-      document.getElementById("btnAudio").href = v.music;
-      document.getElementById("btnCover").href = v.cover;
+      document.getElementById("btnHD").href = videoSrc;
+      document.getElementById("btnSD</h4>").href = v.play || videoSrc;
+      document.getElementById("btnAudio").href = v.music || "#";
+      document.getElementById("btnCover").href = v.cover || "#";
 
-      result.textContent = "Thành công!";
+      result.textContent = "Thành công! Đã lấy video không logo.";
       infoBox.style.display = "block";
     } else {
-      result.textContent = "Lỗi API: " + (data.error || JSON.stringify(data));
+      result.textContent = data.msg || "Không thể lấy thông tin video từ liên kết này.";
     }
   } catch (err) {
-    result.textContent = "Lỗi kết nối: " + err.message;
+    result.textContent = "Lỗi kết nối máy chủ: " + err.message;
   }
 }
 </script>
