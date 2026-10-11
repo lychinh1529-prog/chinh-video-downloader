@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chinh Video Downloader</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #10131a;
+  color: white;
+}
+.container {
+  max-width: 480px;
+  margin: 40px auto;
+}
+h1 {
+  text-align: center;
+  font-size: 27px;
+}
+.subtitle {
+  text-align: center;
+  color: #aeb6c6;
+  margin-bottom: 30px;
+}
+.card {
+  background: #1c2230;
+  padding: 20px;
+  border-radius: 16px;
+}
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+textarea {
+  width: 100%;
+  height: 100px;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #414b60;
+  background: #10131a;
+  color: white;
+  font-size: 15px;
+  resize: vertical;
+}
+button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #6c63ff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+.note {
+  color: #b8c0d0;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 18px;
+}
+footer {
+  text-align: center;
+  color: #7f899c;
+  font-size: 12px;
+  margin-top: 25px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Chinh Video Downloader</h1>
+  <p class="subtitle">Công cụ tải video Douyin & Kuaishou</p>
 
+  <div class="card">
+    <label for="link">Dán liên kết video vào đây</label>
+    <textarea id="link" placeholder="Dán liên kết video tại đây..."></textarea>
+    <button onclick="analyze()">Phân tích liên kết</button>
+    <p id="result" role="status" aria-live="polite"></p>
+    <p class="note">
+      Hỗ trợ định hướng cho Douyin và Kuaishou.<br>
+      Chức năng tải video sẽ cần kết nối với dịch vụ xử lý liên kết.
+    </p>
+  </div>
+
+  <footer>Chinh Video Downloader · Miễn phí</footer>
+</div>
+
+<script>
+function analyze() {
+  const link = document.getElementById("link").value.trim();
+  const result = document.getElementById("result");
+
+  if (!link) {
+    result.textContent = "Bạn hãy dán liên kết video trước nhé!";
+    return;
+  }
+
+  try {
+    const url = new URL(link);
+    const supported = [
+      "douyin.com",
+      "iesdouyin.com",
+      "kuaishou.com",
+      "chenzhongtech.com"
+    ];
+
+    if (!supported.some(domain =>
+      url.hostname === domain ||
+      url.hostname.endsWith("." + domain)
+    )) {
+      result.textContent = "Liên kết này chưa thuộc nền tảng được hỗ trợ.";
+      return;
+    }
+
+    result.textContent =
+      "Đã nhận liên kết. Chức năng lấy video chưa được kết nối.";
+  } catch {
+    result.textContent = "Liên kết không hợp lệ. Bạn hãy kiểm tra lại nhé!";
+  }
+}
+</script>
+</body>
+</html>
