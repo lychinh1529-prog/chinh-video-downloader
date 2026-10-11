@@ -12,34 +12,48 @@ export async function onRequest(context) {
   try {
     let finalUrl = videoUrl;
     
-    // Tự động giải mã link rút gọn (Douyin / Kuaishou) để lấy URL gốc đầy đủ
-    if (videoUrl.includes('v.douyin.com') || videoUrl.includes('kuaishou.com') || videoUrl.includes('v.kuaishou.com')) {
+    // Giải mã link rút gọn nếu có
+    if (videoUrl.includes('v.douyin.com') || videoUrl.includes('kuaishou.com')) {
       try {
         const redirectRes = await fetch(videoUrl, {
           method: 'GET',
           redirect: 'follow',
           headers: {
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1'
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15'
           }
         });
         finalUrl = redirectRes.url;
-      } catch (e) {
-        // Nếu không giải mã được thì giữ nguyên link gốc
-      }
+      } catch (e) {}
     }
 
-    const apiEndpoint = `https://www.tikwm.com/api/?url=${encodeURIComponent(finalUrl)}`;
+    // Sử dụng API dự phòng ổn định hơn
+    const apiEndpoint = `https://api.douyin.wtf/api?url=${encodeURIComponent(finalUrl)}`;
     
     const response = await fetch(apiEndpoint, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://www.tikwm.com/'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
 
     const data = await response.json();
 
-    return new Response(JSON.stringify(data), {
+    // Chuẩn hóa dữ liệu trả về cho đồng bộ với giao diện
+    const formattedData = {
+      code: 0,
+      data: {
+        hdplay: data.video_url || data.nwm_video_url || data.url,
+        play: data.video_url || data.nwm_video_url || data.url,
+        music: data.music_url || data.music,
+        cover: data.cover_url || data.cover,
+        title: data.title || "Video Douyin / Kuaishou",
+        author: {
+          nickname: data.author || "Tác giả",
+          avatar: data.avatar || ""
+        }
+      }
+    };
+
+    return new Response(JSON.stringify(formattedData), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json;charset=UTF-8',
@@ -47,7 +61,7 @@ export async function onRequest(context) {
       }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Lỗi kết nối máy chủ xử lý', details: err.message }), {
+    return new Response(JSON.stringify({ error: 'Lỗi kết nối máy chủ', details: err.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' }
     });
