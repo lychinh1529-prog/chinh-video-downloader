@@ -200,20 +200,25 @@ async function pasteLink() {
 }
 
 async function analyze() {
-  const link = document.getElementById("link").value.trim();
+  const rawText = document.getElementById("link").value.trim();
   const result = document.getElementById("result");
   const infoBox = document.getElementById("videoInfoBox");
 
   infoBox.style.display = "none";
 
-  if (!link) {
+  if (!rawText) {
     result.textContent = "Bạn hãy dán liên kết video trước nhé!";
     return;
   }
 
-  // Lọc lấy URL trong đoạn văn bản nếu có chữ thừa
-  const urlMatch = link.match(/(https?:\/\/[^\s]+)/g);
-  const targetUrl = urlMatch ? urlMatch[0] : link;
+  // Tự động tìm đường dẫn http/https có trong đoạn văn bản người dùng dán vào
+  const urlMatches = rawText.match(/https?:\/\/[^\s]+/g);
+  if (!urlMatches || urlMatches.length === 0) {
+    result.textContent = "Không tìm thấy liên kết hợp lệ trong nội dung bạn dán.";
+    return;
+  }
+
+  const targetUrl = urlMatches[0];
 
   try {
     const parsedUrl = new URL(targetUrl);
@@ -232,9 +237,8 @@ async function analyze() {
       return;
     }
 
-    result.textContent = "Đang xử lý, vui lòng chờ trong giây lát...";
+    result.textContent = "Đang trích xuất video, vui lòng chờ...";
 
-    // Sử dụng API công khai miễn phí để bóc tách video
     const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(targetUrl)}`;
     
     const response = await fetch(apiUrl);
@@ -243,11 +247,9 @@ async function analyze() {
     if (data && data.code === 0 && data.data) {
       const videoData = data.data;
       
-      // Hiển thị thông tin
       document.getElementById("thumb").src = videoData.cover || "";
-      document.getElementById("vTitle",).textContent = videoData.title || "Video không có tiêu đề";
+      document.getElementById("vTitle").textContent = videoData.title || "Video không có tiêu đề";
       
-      // Đường dẫn tải video không logo
       const videoDownloadUrl = videoData.play || videoData.wmplay;
       document.getElementById("downloadBtn").href = videoDownloadUrl;
 
