@@ -104,7 +104,7 @@ textarea:focus {
   text-align: center;
   word-break: break-word;
 }
-/* Khu vực hiển thị kết quả video (ẩn đi khi chưa có dữ liệu) */
+/* Khu vực hiển thị kết quả video */
 .video-info {
   display: none;
   margin-top: 16px;
@@ -116,7 +116,7 @@ textarea:focus {
 .video-info img {
   width: 100%;
   border-radius: 8px;
-  max-height: 240px;
+  max-height: 220px;
   object-fit: cover;
   margin-bottom: 8px;
 }
@@ -124,6 +124,8 @@ textarea:focus {
   font-size: 13px;
   color: #e2e8f0;
   margin-bottom: 12px;
+  max-height: 60px;
+  overflow: hidden;
 }
 .btn-download {
   display: block;
@@ -136,6 +138,9 @@ textarea:focus {
   text-decoration: none;
   font-weight: bold;
   font-size: 14px;
+}
+.btn-download:active {
+  opacity: 0.9;
 }
 .note {
   color: #94a3b8;
@@ -172,12 +177,12 @@ footer {
     <div id="videoInfoBox" class="video-info">
       <img id="thumb" src="" alt="Ảnh bìa video">
       <div id="vTitle" class="video-title"></div>
-      <a id="downloadBtn" href="#" class="btn-download" target="_blank">Tải video không logo</a>
+      <a id="downloadBtn" href="#" class="btn-download" target="_blank" download>Tải xuống video (Không logo)</a>
     </div>
 
     <p class="note">
-      • Hỗ trợ nền tảng Douyin và Kuaishou.<br>
-      • Dán link trực tiếp để tiến hành xử lý.
+      • Hỗ trợ Douyin và Kuaishou.<br>
+      • Nhấn nút tải để lưu video về điện thoại.
     </p>
   </div>
 
@@ -185,22 +190,20 @@ footer {
 </div>
 
 <script>
-// Tính năng nút Dán nhanh từ bộ nhớ tạm (Clipboard)
 async function pasteLink() {
   try {
     const text = await navigator.clipboard.readText();
     document.getElementById("link").value = text;
   } catch (err) {
-    alert("Trình duyệt không cho phép dán tự động. Bạn hãy nhấn giữ vào ô nhập và chọn Dán (Paste) thủ công nhé!");
+    alert("Trình duyệt không cho phép dán tự động. Bạn hãy nhấn giữ vào ô nhập và chọn Dán thủ công nhé!");
   }
 }
 
-function analyze() {
+async function analyze() {
   const link = document.getElementById("link").value.trim();
   const result = document.getElementById("result");
   const infoBox = document.getElementById("videoInfoBox");
 
-  // Ẩn khung thông tin cũ nếu có
   infoBox.style.display = "none";
 
   if (!link) {
@@ -208,8 +211,12 @@ function analyze() {
     return;
   }
 
+  // Lọc lấy URL trong đoạn văn bản nếu có chữ thừa
+  const urlMatch = link.match(/(https?:\/\/[^\s]+)/g);
+  const targetUrl = urlMatch ? urlMatch[0] : link;
+
   try {
-    const url = new URL(link);
+    const parsedUrl = new URL(targetUrl);
     const supported = [
       "douyin.com",
       "iesdouyin.com",
@@ -218,23 +225,42 @@ function analyze() {
     ];
 
     if (!supported.some(domain =>
-      url.hostname === domain ||
-      url.hostname.endsWith("." + domain)
+      parsedUrl.hostname === domain ||
+      parsedUrl.hostname.endsWith("." + domain)
     )) {
       result.textContent = "Liên kết này chưa thuộc nền tảng Douyin hoặc Kuaishou được hỗ trợ.";
       return;
     }
 
-    result.textContent = "Đã nhận liên kết hợp lệ! Đang chờ kết nối máy chủ xử lý...";
-    
-    // (Tạm thời) Giả lập trạng thái chờ để kiểm tra giao diện hiển thị
-    // Sau khi kết nối API ở bước sau, chúng ta sẽ điền dữ liệu thực tế vào đây.
+    result.textContent = "Đang xử lý, vui lòng chờ trong giây lát...";
 
-  } catch {
-    result.textContent = "Liên kết không hợp lệ. Bạn hãy kiểm tra lại nhé!";
+    // Sử dụng API công khai miễn phí để bóc tách video
+    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(targetUrl)}`;
+    
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (data && data.code === 0 && data.data) {
+      const videoData = data.data;
+      
+      // Hiển thị thông tin
+      document.getElementById("thumb").src = videoData.cover || "";
+      document.getElementById("vTitle",).textContent = videoData.title || "Video không có tiêu đề";
+      
+      // Đường dẫn tải video không logo
+      const videoDownloadUrl = videoData.play || videoData.wmplay;
+      document.getElementById("downloadBtn").href = videoDownloadUrl;
+
+      result.textContent = "Phân tích thành công!";
+      infoBox.style.display = "block";
+    } else {
+      result.textContent = "Không thể lấy thông tin video. Liên kết có thể không tồn tại hoặc đã bị xóa.";
+    }
+
+  } catch (err) {
+    result.textContent = "Đã xảy ra lỗi kết nối hoặc liên kết không hợp lệ!";
   }
 }
 </script>
 </body>
 </html>
-
