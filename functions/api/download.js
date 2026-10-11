@@ -12,7 +12,7 @@ export async function onRequest(context) {
   try {
     let finalUrl = videoUrl;
     
-    // Tự động giải mã link rút gọn Douyin / Kuaishou
+    // Giải mã link rút gọn Douyin / Kuaishou
     if (videoUrl.includes('v.douyin.com') || videoUrl.includes('kuaishou.com') || videoUrl.includes('v.kuaishou.com')) {
       try {
         const redirectRes = await fetch(videoUrl, {
@@ -26,16 +26,32 @@ export async function onRequest(context) {
       } catch (e) {}
     }
 
-    const apiEndpoint = `https://www.tikwm.com/api/?url=${encodeURIComponent(finalUrl)}&hd=1`;
+    // Sử dụng endpoint thay thế không bị giới hạn 10k request khắt khe
+    const apiEndpoint = `https://api.douyin.wtf/api?url=${encodeURIComponent(finalUrl)}`;
     
     const response = await fetch(apiEndpoint, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://www.tikwm.com/'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
 
-    const data = await response.json();
+    const rawData = await response.json();
+
+    // Chuẩn hóa dữ liệu trả về khớp hoàn toàn với giao diện của bạn
+    const data = {
+      code: 0,
+      data: {
+        hdplay: rawData.video_url || rawData.nwm_video_url || rawData.url,
+        play: rawData.video_url || rawData.nwm_video_url || rawData.url,
+        music: rawData.music_url || rawData.music,
+        cover: rawData.cover_url || rawData.cover,
+        title: rawData.title || "Video không logo",
+        author: {
+          nickname: rawData.author || "Tác giả",
+          avatar: rawData.avatar || ""
+        }
+      }
+    };
 
     return new Response(JSON.stringify(data), {
       status: 200,
@@ -45,7 +61,7 @@ export async function onRequest(context) {
       }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ code: -1, msg: err.message }), {
+    return new Response(JSON.stringify({ code: -1, msg: "Lỗi xử lý: " + err.message }), {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8', 'Access-Control-Allow-Origin': '*' }
     });
