@@ -218,27 +218,11 @@ async function analyze() {
   const targetUrl = urlMatches[0];
 
   try {
-    const parsedUrl = new URL(targetUrl);
-    const supported = [
-      "douyin.com",
-      "iesdouyin.com",
-      "kuaishou.com",
-      "chenzhongtech.com"
-    ];
+    result.textContent = "Đang phân tích liên kết video...";
 
-    if (!supported.some(domain =>
-      parsedUrl.hostname === domain ||
-      parsedUrl.hostname.endsWith("." + domain)
-    )) {
-      result.textContent = "Liên kết này chưa thuộc nền tảng Douyin hoặc Kuaishou được hỗ trợ.";
-      return;
-    }
+    // Sử dụng API dự phòng hỗ trợ phân tích link rút gọn trực tiếp
+    const apiUrl = `https://api.tikwm.com/api/?url=${encodeURIComponent(targetUrl)}&count=12&hd=1`;
 
-    result.textContent = "Đang phân tích video, vui lòng đợi...";
-
-    // Gọi trực tiếp đến API chuẩn không qua trung gian
-    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(targetUrl)}`;
-    
     const response = await fetch(apiUrl);
     const data = await response.json();
 
@@ -246,9 +230,9 @@ async function analyze() {
       const videoData = data.data;
       
       document.getElementById("thumb").src = videoData.cover || "";
-      document.getElementById("vTitle").textContent = videoData.title || "Video không có tiêu đề";
+      document.getElementById("vTitle").textContent = videoData.title || "Video Douyin / Kuaishou";
       
-      const videoDownloadUrl = videoData.play || videoData.wmplay;
+      const videoDownloadUrl = videoData.hdplay || videoData.play || videoData.wmplay;
       document.getElementById("downloadBtn").href = videoDownloadUrl;
 
       result.textContent = "Phân tích thành công!";
@@ -258,7 +242,7 @@ async function analyze() {
     }
 
   } catch (err) {
-    result.textContent = "Không thể kết nối đến máy chủ xử lý. Bạn hãy kiểm tra lại kết nối mạng nhé!";
+    result.textContent = "Lỗi kết nối mạng hoặc trình duyệt chặn yêu cầu. Bạn hãy thử lại nhé!";
   }
 }
 </script>
