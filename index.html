@@ -51,7 +51,8 @@ footer { text-align: center; color: #475569; font-size: 12px; margin-top: 15px; 
     </div>
 
     <div class="input-group">
-      <textarea id="link" placeholder="Dán liên kết tại đây..." oninput="updateCount()"></textarea>
+      <!-- Thêm maxlength="500" để chặn cứng không cho nhập/dán quá 500 ký tự -->
+      <textarea id="link" maxlength="500" placeholder="Dán liên kết tại đây..." oninput="updateCount()"></textarea>
       <button class="btn-paste" onclick="pasteLink()">Dán</button>
     </div>
     
@@ -88,7 +89,11 @@ function updateCount() {
 
 async function pasteLink() {
   try {
-    document.getElementById("link").value = await navigator.clipboard.readText();
+    let text = await navigator.clipboard.readText();
+    if (text.length > 500) {
+      text = text.substring(0, 500); // Cắt bớt nếu quá 500 ký tự
+    }
+    document.getElementById("link").value = text;
     updateCount();
   } catch (err) {
     alert("Hãy giữ tay vào ô nhập và chọn Dán nhé!");
@@ -126,7 +131,6 @@ async function analyze() {
     const response = await fetch(`/api/download?url=${encodeURIComponent(urlMatches[0])}`);
     const data = await response.json();
 
-    // Hiển thị nguyên văn phản hồi từ server để debug
     if (data && data.code === 0 && data.data) {
       const v = data.data;
       document.getElementById("videoPlayer").src = v.hdplay || v.play;
@@ -142,8 +146,7 @@ async function analyze() {
       result.textContent = "Thành công!";
       infoBox.style.display = "block";
     } else {
-      // In ra lỗi chi tiết máy chủ trả về
-      result.textContent = "Lỗi API: " + JSON.stringify(data);
+      result.textContent = "Lỗi API: " + (data.error || JSON.stringify(data));
     }
   } catch (err) {
     result.textContent = "Lỗi kết nối: " + err.message;
