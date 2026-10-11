@@ -1,58 +1,513 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0d1117">
-    <title>Chính TikTok Downloader</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10111a">
 
-    <style>
-        * { box-sizing: border-box; }
+  <title>Chinh Video Downloader</title>
 
-        body {
-            background: #0d1117;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 15px;
+  <meta
+    name="description"
+    content="Công cụ hỗ trợ lấy thông tin và tải video từ các đường dẫn được hỗ trợ."
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0d0e16;
+      --card: #171925;
+      --border: #303348;
+      --text: #f5f6ff;
+      --muted: #a5a9c2;
+      --primary: #7465ff;
+      --primary-hover: #8a7eff;
+      --success: #45d6a0;
+      --danger: #ff7777;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(
+          ellipse at top,
+          #25234b 0%,
+          var(--bg) 55%
+        );
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    button,
+    textarea,
+    a {
+      font: inherit;
+    }
+
+    .container {
+      width: min(100% - 32px, 760px);
+      margin: 0 auto;
+      padding: 38px 0 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 68px;
+      height: 68px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #8c7cff, #5142e8);
+      font-size: 30px;
+      font-weight: bold;
+      box-shadow: 0 8px 35px #6655ff45;
+    }
+
+    h1 {
+      margin: 15px 0 8px;
+      font-size: clamp(26px, 6vw, 36px);
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .card {
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #171925ee;
+      box-shadow: 0 18px 55px #00000025;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .help {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      font-weight: bold;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      resize: vertical;
+      color: var(--text);
+      background: #0e101a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    textarea::placeholder {
+      color: #777c96;
+    }
+
+    button,
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 12px;
+      color: white;
+      background: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition:
+        background 0.2s,
+        transform 0.2s;
+    }
+
+    button:hover,
+    .download-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    button:active,
+    .download-btn:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .main-button {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .status {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.error {
+      color: var(--danger);
+      border-color: #703b4b;
+      background: #361c28;
+    }
+
+    .status.success {
+      color: var(--success);
+      border-color: #285c4d;
+      background: #142c28;
+    }
+
+    .status.info {
+      color: #c5c0ff;
+      background: #24213d;
+    }
+
+    .result {
+      display: none;
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    .video-title {
+      margin: 0 0 15px;
+      overflow-wrap: anywhere;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      max-height: 560px;
+      background: #050505;
+      border-radius: 12px;
+    }
+
+    .download-btn {
+      width: 100%;
+      margin-top: 15px;
+      background: #16865f;
+    }
+
+    .download-btn:hover {
+      background: #1aa574;
+    }
+
+    .tips {
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #141621;
+    }
+
+    .tips h2 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .tips ul {
+      margin: 0;
+      padding-left: 21px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tips li + li {
+      margin-top: 5px;
+    }
+
+    footer {
+      padding: 25px 0 10px;
+      text-align: center;
+      color: #8589a2;
+      font-size: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: min(100% - 22px, 760px);
+        padding-top: 25px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .logo {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <header class="header">
+      <div class="logo" aria-hidden="true">CV</div>
+
+      <h1>Chinh Video Downloader</h1>
+
+      <p class="subtitle">
+        Công cụ hỗ trợ lấy thông tin và tải video
+      </p>
+    </header>
+
+    <section class="card">
+      <h2 class="section-title">Tải video</h2>
+
+      <p class="help">
+        Dán đường dẫn video bạn muốn xử lý vào ô bên dưới.
+      </p>
+
+      <form id="download-form">
+        <label for="video-url">Đường dẫn video</label>
+
+        <textarea
+          id="video-url"
+          name="url"
+          placeholder="Dán link video TikTok, Douyin hoặc Kuaishou vào đây..."
+          required
+          autocomplete="url"
+        ></textarea>
+
+        <button
+          id="submit-button"
+          class="main-button"
+          type="submit"
+        >
+          <span id="button-text">Lấy thông tin video</span>
+        </button>
+      </form>
+
+      <div
+        id="status"
+        class="status"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <section id="result" class="result">
+        <h2>Video của bạn</h2>
+
+        <p id="video-title" class="video-title"></p>
+
+        <video
+          id="video-player"
+          controls
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <a
+          id="download-link"
+          class="download-btn"
+          href="#"
+          download
+        >
+          Tải video xuống
+        </a>
+      </section>
+    </section>
+
+    <section class="tips">
+      <h2>Hướng dẫn sử dụng</h2>
+
+      <ul>
+        <li>Sao chép đường dẫn video từ ứng dụng hoặc trình duyệt.</li>
+        <li>Dán đường dẫn vào ô nhập ở phía trên.</li>
+        <li>Nhấn nút lấy thông tin và chờ hệ thống xử lý.</li>
+        <li>Nếu video được hỗ trợ, bạn có thể xem trước và tải xuống.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Chinh Video Downloader · Công cụ hỗ trợ xử lý đường dẫn video
+    </footer>
+
+  </main>
+
+  <script>
+    "use strict";
+
+    const API_BASE = "https://chinh-video-api.onrender.com";
+
+    const form = document.getElementById("download-form");
+    const urlInput = document.getElementById("video-url");
+    const submitButton = document.getElementById("submit-button");
+    const buttonText = document.getElementById("button-text");
+    const statusBox = document.getElementById("status");
+    const resultBox = document.getElementById("result");
+    const videoTitle = document.getElementById("video-title");
+    const videoPlayer = document.getElementById("video-player");
+    const downloadLink = document.getElementById("download-link");
+
+    function showStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = "status show " + type;
+    }
+
+    function hideResult() {
+      resultBox.classList.remove("show");
+      videoPlayer.pause();
+      videoPlayer.removeAttribute("src");
+      videoPlayer.load();
+      downloadLink.removeAttribute("href");
+    }
+
+    function getErrorMessage(error) {
+      if (error instanceof TypeError) {
+        return "Không thể kết nối API. Hãy kiểm tra mạng hoặc trạng thái máy chủ Render.";
+      }
+
+      return error.message || "Đã xảy ra lỗi không xác định.";
+    }
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const url = urlInput.value.trim();
+
+      if (!url) {
+        showStatus("Vui lòng nhập đường dẫn video.", "error");
+        return;
+      }
+
+      let parsedUrl;
+
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        showStatus("Đường dẫn không hợp lệ. Hãy kiểm tra lại link.", "error");
+        return;
+      }
+
+      if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+        showStatus("Đường dẫn phải bắt đầu bằng http:// hoặc https://.", "error");
+        return;
+      }
+
+      hideResult();
+      submitButton.disabled = true;
+      buttonText.textContent = "Đang xử lý...";
+      showStatus("Đang kết nối máy chủ. Vui lòng chờ...", "info");
+
+      try {
+        const response = await fetch(API_BASE + "/api/download", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            url: url
+          })
+        });
+
+        const rawText = await response.text();
+        let data;
+
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          throw new Error(
+            "Máy chủ trả về dữ liệu không hợp lệ. Hãy kiểm tra API trên Render."
+          );
         }
 
-        .container {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            max-width: 430px;
+        if (!response.ok) {
+          throw new Error(
+            data.detail || data.message || "Máy chủ gặp lỗi HTTP " + response.status
+          );
         }
 
-        h1 {
-            text-align: center;
-            font-size: 23px;
+        if (data.code !== undefined && Number(data.code) !== 0) {
+          throw new Error(data.message || "Không thể xử lý đường dẫn video.");
         }
 
-        .subtitle {
-            text-align: center;
-            color: #8b949e;
-            font-size: 13px;
-            margin-bottom: 22px;
-        }
+        const info = data.data || data;
+        const title =
+          info.title ||
+          info.desc ||
+          info.description ||
+          "Video đã được xử lý";
 
-        textarea {
-            width: 100%;
-            min-height: 75px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 12px;
-            color: white;
-            font-size: 15px;
-            resize: vertical;
-        }
+        const videoUrl = API_BASE + "/api/video?url=" + encodeURIComponent(url);
+        const fileUrl = API_BASE + "/api/download-file?url=" + encodeURIComponent(url);
 
-        button, .download-btn {
-           
+        videoTitle.textContent = title;
+        videoPlayer.src = videoUrl;
+        downloadLink.href = fileUrl;
+
+        resultBox.classList.add("show");
+
+        showStatus(
+          "Đã lấy được thông tin. Nếu video không phát được, máy chủ có thể chưa tải được tệp video.",
+          "success"
+        );
+
+      } catch (error) {
+        showStatus(getErrorMessage(error), "error");
+      } finally {
+        submitButton.disabled = false;
+        buttonText.textContent = "Lấy thông tin video";
+      }
+    });
+  </script>
+</body>
+</html>
