@@ -122,7 +122,6 @@ textarea:focus {
   word-break: break-word;
 }
 
-/* Khu vực hiển thị kết quả giống mẫu yêu cầu */
 .video-info {
   display: none;
   margin-top: 16px;
@@ -132,7 +131,6 @@ textarea:focus {
   border: 1px solid #1e293b;
 }
 
-/* Khung chứa trình phát video tự động co giãn theo tỉ lệ 9:16 hoặc 16:9 */
 .video-player-container {
   width: 100%;
   background: #000;
@@ -172,7 +170,6 @@ video {
   color: #f8fafc;
 }
 
-/* 4 nút tải xuống theo đúng yêu cầu */
 .download-options {
   display: flex;
   flex-direction: column;
@@ -189,15 +186,10 @@ video {
   font-weight: bold;
   font-size: 13px;
 }
-/* 1. Tải chất lượng cao nhất */
 .btn-hd { background: #db2777; box-shadow: 0 2px 8px rgba(219,39,119,0.3); }
-/* 2. Tải chất lượng trung bình */
 .btn-sd { background: #ea580c; box-shadow: 0 2px 8px rgba(234,88,12,0.3); }
-/* 3. Tải âm thanh MP3 */
 .btn-mp3 { background: #7c3aed; box-shadow: 0 2px 8px rgba(124,58,237,0.3); }
-/* 4. Tải ảnh bìa */
 .btn-cover { background: #0284c7; box-shadow: 0 2px 8px rgba(2,132,199,0.3); }
-
 .btn-option:active { opacity: 0.85; }
 
 .note {
@@ -236,15 +228,11 @@ footer {
     <button class="btn-primary" onclick="analyze()">Phân tích liên kết</button>
     <p id="result" role="status" aria-live="polite"></p>
 
-    <!-- Khu vực kết quả hiển thị sau khi phân tích -->
     <div id="videoInfoBox" class="video-info">
-      
-      <!-- Khung video phát trực tiếp (Tương thích cả 9:16 và 16:9) -->
       <div class="video-player-container">
         <video id="videoPlayer" controls playsinline></video>
       </div>
 
-      <!-- Thông tin kênh/tác giả minh họa -->
       <div class="profile-box">
         <img id="authorAvatar" src="" alt="Avatar">
         <div>
@@ -253,10 +241,9 @@ footer {
         </div>
       </div>
       
-      <!-- 4 nút tải xuống đúng chuẩn yêu cầu -->
       <div class="download-options">
-        <a id="btnHD" href="#" class="btn-option btn-hd" target="_blank" download>1. Tải xuống [Chất lượng cao HD / 1080p]</a>
-        <a id="btnSD" href="#" class="btn-option btn-sd" target="_blank" download>2. Tải xuống [Chất lượng trung bình 720p]</a>
+        <a id="btnHD" href="#" class="btn-option btn-hd" target="_blank" download>1. Tải xuống [Chất lượng cao HD / Không logo]</a>
+        <a id="btnSD" href="#" class="btn-option btn-sd" target="_blank" download>2. Tải xuống [Chất lượng trung bình SD]</a>
         <a id="btnAudio" href="#" class="btn-option btn-mp3" target="_blank" download>3. Tải âm thanh [♫ MP3]</a>
         <a id="btnCover" href="#" class="btn-option btn-cover" target="_blank" download>4. Tải xuống [Ảnh bìa video]</a>
       </div>
@@ -267,7 +254,7 @@ footer {
     </p>
   </div>
 
-  <footer>Chinh Video Downloader · Giao diện chuẩn mẫu</footer>
+  <footer>Chinh Video Downloader · Hoạt động thực tế</footer>
 </div>
 
 <script>
@@ -294,8 +281,7 @@ function clearText() {
   updateCount();
 }
 
-// Mô phỏng kiểm tra hiển thị giao diện mẫu chuẩn 4 nút
-function analyze() {
+async function analyze() {
   const rawText = document.getElementById("link").value.trim();
   const result = document.getElementById("result");
   const infoBox = document.getElementById("videoInfoBox");
@@ -307,18 +293,52 @@ function analyze() {
     return;
   }
 
-  result.textContent = "Đang phân tích giao diện mẫu...";
+  const urlMatches = rawText.match(/https?:\/\/[^\s]+/g);
+  if (!urlMatches || urlMatches.length === 0) {
+    result.textContent = "Không tìm thấy liên kết hợp lệ trong nội dung bạn dán.";
+    return;
+  }
 
-  setTimeout(() => {
-    // Dữ liệu mẫu minh họa khung video và 4 nút
-    document.getElementById("videoPlayer").src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
-    document.getElementById("authorAvatar").src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=60";
-    document.getElementById("authorName").textContent = "Chính Video Creator";
-    document.getElementById("vTitle").textContent = "Video minh họa bố cục chuẩn 9:16 và 16:9 với 4 tùy chọn tải xuống.";
+  const targetUrl = urlMatches[0];
 
-    result.textContent = "Phân tích thành công!";
-    infoBox.style.display = "block";
-  }, 600);
+  try {
+    result.textContent = "Đang kết nối qua máy chủ để lấy video thực tế...";
+
+    // Gọi đến máy chủ Functions thực tế ở bên trong Cloudflare Pages
+    const response = await fetch(`/api/download?url=${encodeURIComponent(targetUrl)}`);
+    const data = await response.json();
+
+    if (data && data.code === 0 && data.data) {
+      const videoData = data.data;
+      
+      const hdUrl = videoData.hdplay || videoData.play;
+      const sdUrl = videoData.play || hdUrl;
+      const audioUrl = videoData.music;
+      const coverUrl = videoData.cover;
+
+      // Đưa video thật vào khung phát
+      document.getElementById("videoPlayer").src = hdUrl;
+      
+      // Hiển thị thông tin tác giả thật
+      document.getElementById("authorAvatar").src = videoData.author?.avatar || "";
+      document.getElementById("authorName").textContent = videoData.author?.nickname || "Tác giả Douyin / Kuaishou";
+      document.getElementById("vTitle").textContent = videoData.title || "Video không có tiêu đề";
+      
+      // Gán đường dẫn thật vào đúng 4 nút tải xuống
+      document.getElementById("btnHD").href = hdUrl;
+      document.getElementById("btnSD").href = sdUrl;
+      document.getElementById("btnAudio").href = audioUrl;
+      document.getElementById("btnCover").href = coverUrl;
+
+      result.textContent = "Lấy video thành công và đã xóa logo!";
+      infoBox.style.display = "block";
+    } else {
+      result.textContent = "Không thể lấy thông tin video. Liên kết có thể không tồn tại hoặc đã bị xóa.";
+    }
+
+  } catch (err) {
+    result.textContent = "Lỗi kết nối máy chủ xử lý. Bạn hãy thử lại sau ít phút!";
+  }
 }
 </script>
 </body>
