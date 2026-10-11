@@ -10,82 +10,174 @@
 }
 body {
   margin: 0;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #10131a;
-  color: white;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
 }
 .container {
   max-width: 480px;
-  margin: 40px auto;
+  margin: 20px auto;
+}
+header {
+  text-align: center;
+  margin-bottom: 24px;
 }
 h1 {
-  text-align: center;
-  font-size: 27px;
+  font-size: 24px;
+  margin: 0 0 6px 0;
+  color: #38bdf8;
 }
 .subtitle {
-  text-align: center;
-  color: #aeb6c6;
-  margin-bottom: 30px;
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 0;
 }
 .card {
-  background: #1c2230;
-  padding: 20px;
+  background: #1e293b;
+  padding: 16px;
   border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  margin-bottom: 20px;
 }
 label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+.input-group {
+  position: relative;
 }
 textarea {
   width: 100%;
-  height: 100px;
-  border-radius: 10px;
+  height: 90px;
+  border-radius: 12px;
   padding: 12px;
-  border: 1px solid #414b60;
-  background: #10131a;
+  padding-right: 75px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+textarea:focus {
+  border-color: #38bdf8;
+}
+.btn-paste {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: #334155;
+  color: #f8fafc;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-paste:active {
+  background: #475569;
+}
+.btn-primary {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
   font-size: 15px;
-  resize: vertical;
-}
-button {
-  width: 100%;
-  margin-top: 14px;
-  padding: 14px;
-  border: 0;
-  border-radius: 10px;
-  background: #6c63ff;
-  color: white;
-  font-size: 16px;
   font-weight: bold;
+  cursor: pointer;
+}
+.btn-primary:active {
+  opacity: 0.9;
+}
+#result {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #fbbf24;
+  text-align: center;
+  word-break: break-word;
+}
+/* Khu vực hiển thị kết quả video (ẩn đi khi chưa có dữ liệu) */
+.video-info {
+  display: none;
+  margin-top: 16px;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #334155;
+}
+.video-info img {
+  width: 100%;
+  border-radius: 8px;
+  max-height: 240px;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+.video-title {
+  font-size: 13px;
+  color: #e2e8f0;
+  margin-bottom: 12px;
+}
+.btn-download {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #10b981;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
 }
 .note {
-  color: #b8c0d0;
-  font-size: 13px;
-  line-height: 1.6;
-  margin-top: 18px;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 14px;
 }
 footer {
   text-align: center;
-  color: #7f899c;
+  color: #64748b;
   font-size: 12px;
-  margin-top: 25px;
+  margin-top: 20px;
 }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>Chinh Video Downloader</h1>
-  <p class="subtitle">Công cụ tải video Douyin & Kuaishou</p>
+  <header>
+    <h1>CHINH VIDEO</h1>
+    <p class="subtitle">Trình tải xuống Douyin & Kuaishou</p>
+  </header>
 
   <div class="card">
     <label for="link">Dán liên kết video vào đây</label>
-    <textarea id="link" placeholder="Dán liên kết video tại đây..."></textarea>
-    <button onclick="analyze()">Phân tích liên kết</button>
+    <div class="input-group">
+      <textarea id="link" placeholder="Dán liên kết tại đây..."></textarea>
+      <button class="btn-paste" onclick="pasteLink()">Dán</button>
+    </div>
+    
+    <button class="btn-primary" onclick="analyze()">Phân tích liên kết</button>
     <p id="result" role="status" aria-live="polite"></p>
+
+    <!-- Khu vực hiển thị thông tin sau khi phân tích thành công -->
+    <div id="videoInfoBox" class="video-info">
+      <img id="thumb" src="" alt="Ảnh bìa video">
+      <div id="vTitle" class="video-title"></div>
+      <a id="downloadBtn" href="#" class="btn-download" target="_blank">Tải video không logo</a>
+    </div>
+
     <p class="note">
-      Hỗ trợ định hướng cho Douyin và Kuaishou.<br>
-      Chức năng tải video sẽ cần kết nối với dịch vụ xử lý liên kết.
+      • Hỗ trợ nền tảng Douyin và Kuaishou.<br>
+      • Dán link trực tiếp để tiến hành xử lý.
     </p>
   </div>
 
@@ -93,9 +185,23 @@ footer {
 </div>
 
 <script>
+// Tính năng nút Dán nhanh từ bộ nhớ tạm (Clipboard)
+async function pasteLink() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById("link").value = text;
+  } catch (err) {
+    alert("Trình duyệt không cho phép dán tự động. Bạn hãy nhấn giữ vào ô nhập và chọn Dán (Paste) thủ công nhé!");
+  }
+}
+
 function analyze() {
   const link = document.getElementById("link").value.trim();
   const result = document.getElementById("result");
+  const infoBox = document.getElementById("videoInfoBox");
+
+  // Ẩn khung thông tin cũ nếu có
+  infoBox.style.display = "none";
 
   if (!link) {
     result.textContent = "Bạn hãy dán liên kết video trước nhé!";
@@ -115,12 +221,15 @@ function analyze() {
       url.hostname === domain ||
       url.hostname.endsWith("." + domain)
     )) {
-      result.textContent = "Liên kết này chưa thuộc nền tảng được hỗ trợ.";
+      result.textContent = "Liên kết này chưa thuộc nền tảng Douyin hoặc Kuaishou được hỗ trợ.";
       return;
     }
 
-    result.textContent =
-      "Đã nhận liên kết. Chức năng lấy video chưa được kết nối.";
+    result.textContent = "Đã nhận liên kết hợp lệ! Đang chờ kết nối máy chủ xử lý...";
+    
+    // (Tạm thời) Giả lập trạng thái chờ để kiểm tra giao diện hiển thị
+    // Sau khi kết nối API ở bước sau, chúng ta sẽ điền dữ liệu thực tế vào đây.
+
   } catch {
     result.textContent = "Liên kết không hợp lệ. Bạn hãy kiểm tra lại nhé!";
   }
@@ -128,3 +237,4 @@ function analyze() {
 </script>
 </body>
 </html>
+
