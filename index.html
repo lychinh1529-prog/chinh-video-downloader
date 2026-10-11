@@ -104,7 +104,6 @@ textarea:focus {
   text-align: center;
   word-break: break-word;
 }
-/* Khu vực hiển thị kết quả video */
 .video-info {
   display: none;
   margin-top: 16px;
@@ -173,11 +172,10 @@ footer {
     <button class="btn-primary" onclick="analyze()">Phân tích liên kết</button>
     <p id="result" role="status" aria-live="polite"></p>
 
-    <!-- Khu vực hiển thị thông tin sau khi phân tích thành công -->
     <div id="videoInfoBox" class="video-info">
       <img id="thumb" src="" alt="Ảnh bìa video">
       <div id="vTitle" class="video-title"></div>
-      <a id="downloadBtn" href="#" class="btn-download" target="_blank" download>Tải xuống video (Không logo)</a>
+      <a id="downloadBtn" href="#" class="btn-download" target="_blank">Tải xuống video (Không logo)</a>
     </div>
 
     <p class="note">
@@ -195,7 +193,7 @@ async function pasteLink() {
     const text = await navigator.clipboard.readText();
     document.getElementById("link").value = text;
   } catch (err) {
-    alert("Trình duyệt không cho phép dán tự động. Bạn hãy nhấn giữ vào ô nhập và chọn Dán thủ công nhé!");
+    alert("Không thể dán tự động. Bạn hãy giữ tay vào ô nhập và chọn Dán nhé!");
   }
 }
 
@@ -211,7 +209,6 @@ async function analyze() {
     return;
   }
 
-  // Tự động tìm đường dẫn http/https có trong đoạn văn bản người dùng dán vào
   const urlMatches = rawText.match(/https?:\/\/[^\s]+/g);
   if (!urlMatches || urlMatches.length === 0) {
     result.textContent = "Không tìm thấy liên kết hợp lệ trong nội dung bạn dán.";
@@ -221,46 +218,32 @@ async function analyze() {
   const targetUrl = urlMatches[0];
 
   try {
-    const parsedUrl = new URL(targetUrl);
-    const supported = [
-      "douyin.com",
-      "iesdouyin.com",
-      "kuaishou.com",
-      "chenzhongtech.com"
-    ];
+    result.textContent = "Đang kết nối để lấy thông tin video...";
 
-    if (!supported.some(domain =>
-      parsedUrl.hostname === domain ||
-      parsedUrl.hostname.endsWith("." + domain)
-    )) {
-      result.textContent = "Liên kết này chưa thuộc nền tảng Douyin hoặc Kuaishou được hỗ trợ.";
-      return;
-    }
-
-    result.textContent = "Đang trích xuất video, vui lòng chờ...";
-
-    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(targetUrl)}`;
+    // Sử dụng endpoint API thay thế hoạt động ổn định hơn cho web tĩnh
+    const apiUrl = `https://api.douyin.wtf/api?url=${encodeURIComponent(targetUrl)}`;
     
     const response = await fetch(apiUrl);
     const data = await response.json();
 
-    if (data && data.code === 0 && data.data) {
-      const videoData = data.data;
-      
-      document.getElementById("thumb").src = videoData.cover || "";
-      document.getElementById("vTitle").textContent = videoData.title || "Video không có tiêu đề";
-      
-      const videoDownloadUrl = videoData.play || videoData.wmplay;
-      document.getElementById("downloadBtn").href = videoDownloadUrl;
+    if (data && (data.status === "success" || data.video_url || data.url)) {
+      // Lấy đường dẫn và ảnh bìa từ cấu trúc phản hồi mới
+      const videoUrl = data.video_url || data.url || data.nwm_video_url;
+      const coverUrl = data.cover_url || data.cover;
+      const titleText = data.title || "Video Douyin / Kuaishou";
+
+      document.getElementById("thumb").src = coverUrl || "";
+      document.getElementById("vTitle").textContent = titleText;
+      document.getElementById("downloadBtn").href = videoUrl;
 
       result.textContent = "Phân tích thành công!";
       infoBox.style.display = "block";
     } else {
-      result.textContent = "Không thể lấy thông tin video. Liên kết có thể không tồn tại hoặc đã bị xóa.";
+      result.textContent = "Không thể trích xuất video. Vui lòng kiểm tra lại liên kết!";
     }
 
   } catch (err) {
-    result.textContent = "Đã xảy ra lỗi kết nối hoặc liên kết không hợp lệ!";
+    result.textContent = "Lỗi kết nối hoặc định dạng liên kết chưa được hỗ trợ.";
   }
 }
 </script>
