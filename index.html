@@ -1,177 +1,169 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chinh TikTok Downloader</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0f172a;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 520px;
-      padding: 26px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 18px;
-    }
-
-    h1 { text-align: center; }
-
-    .subtitle {
-      text-align: center;
-      color: #cbd5e1;
-      margin-bottom: 24px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 110px;
-      padding: 14px;
-      border: 1px solid #475569;
-      border-radius: 10px;
-      background: #0f172a;
-      color: white;
-      font-size: 15px;
-      resize: vertical;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 14px;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: #fe2c55;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled { opacity: 0.6; }
-
-    #result {
-      margin-top: 18px;
-      overflow-wrap: anywhere;
-      line-height: 1.6;
-    }
-
-    #result img {
-      width: 100%;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    #result a {
-      display: inline-block;
-      margin: 10px 10px 0 0;
-      color: #7dd3fc;
-    }
-
-    .hint {
-      color: #94a3b8;
-      font-size: 13px;
-      line-height: 1.6;
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    footer {
-      margin-top: 24px;
-      color: #94a3b8;
-      text-align: center;
-      font-size: 12px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chính TikTok Downloader</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+        p.subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .input-box {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            resize: none;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #ff3b5c;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #e0324e;
+        }
+        .result-area {
+            margin-top: 15px;
+            text-align: left;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        .status-msg {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .error { color: #f85149; }
+        .success { color: #3fb950; }
+        .warning { color: #d29922; }
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+        .download-btn {
+            display: block;
+            background-color: #238636;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
-  <main class="container">
-    <h1>Chinh TikTok Downloader</h1>
+    <div class="container">
+        <h1>Chính TikTok Downloader</h1>
+        <p class="subtitle">Công cụ nhận dạng liên kết video TikTok</p>
+        
+        <div class="input-box">
+            <textarea id="urlInput" rows="3" placeholder="Dán liên kết TikTok vào đây..."></textarea>
+        </div>
+        
+        <button onclick="analyzeLink()">Phân tích liên kết</button>
+        
+        <div id="resultArea" class="result-area"></div>
+        
+        <div class="footer">Chính TikTok Downloader · Miễn phí</div>
+    </div>
 
-    <p class="subtitle">
-      Công cụ lấy thông tin video TikTok
-    </p>
+    <script>
+        const API_BASE = 'https://chinh-video-api.onrender.com';
 
-    <textarea
-      id="videoUrl"
-      placeholder="Dán liên kết video TikTok vào đây..."
-    ></textarea>
+        async function analyzeLink() {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            const resultArea = document.getElementById('resultArea');
+            
+            resultArea.innerHTML = '';
 
-    <button id="checkButton" onclick="analyzeLink()">
-      Phân tích video
-    </button>
+            if (!urlInput) {
+                resultArea.innerHTML = '<div class="status-msg error">⚠️ Vui lòng dán đường dẫn TikTok!</div>';
+                return;
+            }
 
-    <div id="result" aria-live="polite"></div>
+            if (!urlInput.includes('tiktok.com')) {
+                resultArea.innerHTML = '<div class="status-msg error">❌ Chỉ hỗ trợ liên kết TikTok.</div>';
+                return;
+            }
 
-    <p class="hint">
-      Dành cho video TikTok công khai.
-      Khả năng xử lý phụ thuộc vào máy chủ API.
-    </p>
+            resultArea.innerHTML = '<div class="status-msg warning">⏳ Đang xử lý lấy video...</div>';
 
-    <footer>
-      Chinh TikTok Downloader · Miễn phí
-    </footer>
-  </main>
+            try {
+                // Gọi đúng endpoint /api/download trên Render
+                const response = await fetch(`${API_BASE}/api/download?url=${encodeURIComponent(urlInput)}`);
 
-  <script>
-    const API_BASE = "https://chinh-video-api.onrender.com";
+                if (!response.ok) {
+                    throw new Error('Máy chủ phản hồi lỗi.');
+                }
 
-    function isTikTokUrl(value) {
-      try {
-        const url = new URL(value);
-        const host = url.hostname.toLowerCase();
-
-        return (
-          (host === "tiktok.com" || host.endsWith(".tiktok.com")) &&
-          (url.protocol === "https:" || url.protocol === "http:")
-        );
-      } catch {
-        return false;
-      }
-    }
-
-    async function analyzeLink() {
-      const input = document.getElementById("videoUrl");
-      const result = document.getElementById("result");
-      const button = document.getElementById("checkButton");
-      const link = input.value.trim();
-
-      result.replaceChildren();
-
-      if (!link) {
-        result.textContent = "Bạn hãy dán link TikTok trước nhé!";
-        return;
-      }
-
-      if (!isTikTokUrl(link)) {
-        result.textContent =
-          "Link chưa hợp lệ. Hãy dán đường dẫn TikTok.";
-        return;
-      }
-
-      button.disabled = true;
-      result.textContent =
-        "Đang kết nối API... Máy chủ miễn phí có thể cần thời gian khởi động.";
-
-      try {
-        const endpoint =
-          API_BASE + "/api/download?url=" + encodeURIComponent(link);
-
-        const response = await fetch(endpoint);
-
-        if (!response.ok) {
-          throw new Error("
+                const resData = await response.json();
+                
+                // Khớp cấu trúc dữ liệu trả về từ API (code === 0 và nằm trong data.play)[span_1](start_span)[span_1](end_span)
+                if (resData && resData.code === 0 && resData.data) {
+                    const videoUrl = resData.data.play || resData.data.hdplay;
+                    resultArea.innerHTML = `
+                        <div class="status-msg success">✅ Lấy video thành công!</div>
+                        <a href="${videoUrl}" target="_blank" class="download-btn">Tải xuống Video không logo</a>
+                    `;
+                } else {
+                    resultArea.innerHTML = `<div class="status-msg error">⚠️ API không trả về được video. Link có thể đã hết hạn hoặc bị chặn.</div>`;
+                }
+            } catch (error) {
+                resultArea.innerHTML = `<div class="status-msg error">❌ Lỗi kết nối API. Vui lòng thử lại.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
