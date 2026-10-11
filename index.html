@@ -175,7 +175,7 @@ footer {
     <div id="videoInfoBox" class="video-info">
       <img id="thumb" src="" alt="Ảnh bìa video">
       <div id="vTitle" class="video-title"></div>
-      <a id="downloadBtn" href="#" class="btn-download" target="_blank">Tải xuống video (Không logo)</a>
+      <a id="downloadBtn" href="#" class="btn-download" target="_blank" download>Tải xuống video (Không logo)</a>
     </div>
 
     <p class="note">
@@ -218,32 +218,55 @@ async function analyze() {
   const targetUrl = urlMatches[0];
 
   try {
-    result.textContent = "Đang kết nối để lấy thông tin video...";
+    const parsedUrl = new URL(targetUrl);
+    const supported = [
+      "douyin.com",
+      "iesdouyin.com",
+      "kuaishou.com",
+      "chenzhongtech.com"
+    ];
 
-    // Sử dụng endpoint API thay thế hoạt động ổn định hơn cho web tĩnh
-    const apiUrl = `https://api.douyin.wtf/api?url=${encodeURIComponent(targetUrl)}`;
+    if (!supported.some(domain =>
+      parsedUrl.hostname === domain ||
+      parsedUrl.hostname.endsWith("." + domain)
+    )) {
+      result.textContent = "Liên kết này chưa thuộc nền tảng Douyin hoặc Kuaishou được hỗ trợ.";
+      return;
+    }
+
+    result.textContent = "Đang kết nối để phân tích video...";
+
+    // Sử dụng CORS Proxy an toàn để gọi API bóc tách video không bị chặn trình duyệt
+    const apiEndpoint = `https://www.tikwm.com/api/?url=${encodeURIComponent(targetUrl)}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiEndpoint)}`;
+
+    const response = await fetch(proxyUrl);
+    const wrapperData = await response.json();
     
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    // Phân tích dữ liệu JSON trả về từ API
+    let data = wrapperData;
+    if (typeof wrapperData === 'string') {
+      try { data = JSON.parse(wrapperData); } catch(e) {}
+    }
 
-    if (data && (data.status === "success" || data.video_url || data.url)) {
-      // Lấy đường dẫn và ảnh bìa từ cấu trúc phản hồi mới
-      const videoUrl = data.video_url || data.url || data.nwm_video_url;
-      const coverUrl = data.cover_url || data.cover;
-      const titleText = data.title || "Video Douyin / Kuaishou";
-
-      document.getElementById("thumb").src = coverUrl || "";
-      document.getElementById("vTitle").textContent = titleText;
-      document.getElementById("downloadBtn").href = videoUrl;
+    if (data && data.code === 0 && data.data) {
+      const videoData = data.data;
+      
+      document.getElementById("thumb").src = videoData.cover || "";
+      document.getElementById("vTitle").textContent = videoData.title || "Video không có tiêu đề";
+      
+      // Lấy đường dẫn video không logo
+      const videoDownloadUrl = videoData.play || videoData.wmplay;
+      document.getElementById("downloadBtn").href = videoDownloadUrl;
 
       result.textContent = "Phân tích thành công!";
       infoBox.style.display = "block";
     } else {
-      result.textContent = "Không thể trích xuất video. Vui lòng kiểm tra lại liên kết!";
+      result.textContent = "Không thể lấy thông tin video. Liên kết có thể không tồn tại hoặc đã bị xóa.";
     }
 
   } catch (err) {
-    result.textContent = "Lỗi kết nối hoặc định dạng liên kết chưa được hỗ trợ.";
+    result.textContent = "Đã xảy ra lỗi kết nối. Vui lòng thử lại sau ít phút!";
   }
 }
 </script>
