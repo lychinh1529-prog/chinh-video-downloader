@@ -5,218 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chinh Video Downloader</title>
 <style>
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-body {
-  margin: 0;
-  padding: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #090d16;
-  color: #f1f5f9;
-}
-.container {
-  max-width: 480px;
-  margin: 10px auto;
-}
-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-h1 {
-  font-size: 26px;
-  font-weight: 800;
-  margin: 0 0 4px 0;
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.subtitle {
-  color: #94a3b8;
-  font-size: 13px;
-  margin: 0;
-}
-.card {
-  background: #131c2e;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid #1e293b;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  margin-bottom: 20px;
-}
-.input-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 12px;
-  color: #94a3b8;
-}
-.btn-clear {
-  background: none;
-  border: none;
-  color: #f87171;
-  font-size: 12px;
-  cursor: pointer;
-  padding: 0;
-  font-weight: 600;
-}
-.input-group {
-  position: relative;
-}
-textarea {
-  width: 100%;
-  height: 95px;
-  border-radius: 14px;
-  padding: 12px;
-  padding-right: 65px;
-  border: 1px solid #334155;
-  background: #090d16;
-  color: white;
-  font-size: 14px;
-  resize: none;
-  outline: none;
-  transition: border-color 0.2s;
-}
-textarea:focus {
-  border-color: #38bdf8;
-}
-.btn-paste {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  background: #1e293b;
-  color: #38bdf8;
-  border: 1px solid #334155;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-paste:active {
-  background: #334155;
-}
-.btn-primary {
-  width: 100%;
-  margin-top: 14px;
-  padding: 14px;
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  color: white;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-.btn-primary:active {
-  opacity: 0.85;
-}
-#result {
-  margin-top: 12px;
-  font-size: 13px;
-  color: #fbbf24;
-  text-align: center;
-  word-break: break-word;
-}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #090d16; color: #f1f5f9; }
+.container { max-width: 480px; margin: 10px auto; }
+header { text-align: center; margin-bottom: 20px; }
+h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px 0; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { color: #94a3b8; font-size: 13px; margin: 0; }
+.card { background: #131c2e; padding: 18px; border-radius: 20px; border: 1px solid #1e293b; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-bottom: 20px; }
+.input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: #94a3b8; }
+.btn-clear { background: none; border: none; color: #f87171; font-size: 12px; cursor: pointer; padding: 0; font-weight: 600; }
+.input-group { position: relative; }
+textarea { width: 100%; height: 95px; border-radius: 14px; padding: 12px; padding-right: 65px; border: 1px solid #334155; background: #090d16; color: white; font-size: 14px; resize: none; outline: none; }
+textarea:focus { border-color: #38bdf8; }
+.btn-paste { position: absolute; right: 10px; top: 10px; background: #1e293b; color: #38bdf8; border: 1px solid #334155; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-primary { width: 100%; margin-top: 14px; padding: 14px; border: 0; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; font-size: 15px; font-weight: bold; cursor: pointer; }
+#result { margin-top: 12px; font-size: 13px; color: #fbbf24; text-align: center; word-break: break-word; }
 
-.video-info {
-  display: none;
-  margin-top: 16px;
-  background: #090d16;
-  border-radius: 14px;
-  padding: 14px;
-  border: 1px solid #1e293b;
-}
-
-.video-player-container {
-  width: 100%;
-  background: #000;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-height: 380px;
-}
-video {
-  width: 100%;
-  max-height: 380px;
-  object-fit: contain;
-  outline: none;
-}
-
-.profile-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #131c2e;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-}
-.profile-box img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.profile-name {
-  font-size: 13px;
-  font-weight: bold;
-  color: #f8fafc;
-}
-
-.download-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.btn-option {
-  display: block;
-  width: 100%;
-  text-align: center;
-  color: white;
-  padding: 12px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 13px;
-}
-.btn-hd { background: #db2777; box-shadow: 0 2px 8px rgba(219,39,119,0.3); }
-.btn-sd { background: #ea580c; box-shadow: 0 2px 8px rgba(234,88,12,0.3); }
-.btn-mp3 { background: #7c3aed; box-shadow: 0 2px 8px rgba(124,58,237,0.3); }
-.btn-cover { background: #0284c7; box-shadow: 0 2px 8px rgba(2,132,199,0.3); }
-.btn-option:active { opacity: 0.85; }
-
-.note {
-  color: #64748b;
-  font-size: 12px;
-  line-height: 1.5;
-  margin-top: 14px;
-  text-align: center;
-}
-footer {
-  text-align: center;
-  color: #475569;
-  font-size: 12px;
-  margin-top: 15px;
-}
+.video-info { display: none; margin-top: 16px; background: #090d16; border-radius: 14px; padding: 14px; border: 1px solid #1e293b; }
+.video-player-container { width: 100%; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; max-height: 380px; }
+video { width: 100%; max-height: 380px; object-fit: contain; outline: none; }
+.profile-box { display: flex; align-items: center; gap: 10px; background: #131c2e; padding: 10px; border-radius: 10px; margin-bottom: 12px; }
+.profile-box img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.profile-name { font-size: 13px; font-weight: bold; color: #f8fafc; }
+.download-options { display: flex; flex-direction: column; gap: 8px; }
+.btn-option { display: block; width: 100%; text-align: center; color: white; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 13px; }
+.btn-hd { background: #db2777; }
+.btn-sd { background: #ea580c; }
+.btn-mp3 { background: #7c3aed; }
+.btn-cover { background: #0284c7; }
+.note { color: #64748b; font-size: 12px; text-align: center; margin-top: 14px; }
+footer { text-align: center; color: #475569; font-size: 12px; margin-top: 15px; }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
     <h1>CHINH VIDEO</h1>
-    <p class="subtitle">Trình tải xuống Douyin & Kuaishou chuyên nghiệp</p>
+    <p class="subtitle">Trình tải xuống Douyin & Kuaishou</p>
   </header>
 
   <div class="card">
     <div class="input-header">
-      <span id="charCounter">Bạn có thể nhập liên kết (0/500)</span>
+      <span id="charCounter">Liên kết (0/500)</span>
       <button class="btn-clear" onclick="clearText()">Xóa văn bản</button>
     </div>
 
@@ -232,44 +62,36 @@ footer {
       <div class="video-player-container">
         <video id="videoPlayer" controls playsinline></video>
       </div>
-
       <div class="profile-box">
         <img id="authorAvatar" src="" alt="Avatar">
         <div>
-          <div id="authorName" class="profile-name">Tác giả video</div>
+          <div id="authorName" class="profile-name">Tác giả</div>
           <div id="vTitle" style="font-size: 11px; color: #94a3b8; max-height: 35px; overflow: hidden;"></div>
         </div>
       </div>
-      
       <div class="download-options">
-        <a id="btnHD" href="#" class="btn-option btn-hd" target="_blank" download>1. Tải xuống [Chất lượng cao HD / Không logo]</a>
-        <a id="btnSD" href="#" class="btn-option btn-sd" target="_blank" download>2. Tải xuống [Chất lượng trung bình SD]</a>
-        <a id="btnAudio" href="#" class="btn-option btn-mp3" target="_blank" download>3. Tải âm thanh [♫ MP3]</a>
-        <a id="btnCover" href="#" class="btn-option btn-cover" target="_blank" download>4. Tải xuống [Ảnh bìa video]</a>
+        <a id="btnHD" href="#" class="btn-option btn-hd" target="_blank" download>1. Tải xuống [HD Không logo]</a>
+        <a id="btnSD" href="#" class="btn-option btn-sd" target="_blank" download>2. Tải xuống [SD]</a>
+        <a id="btnAudio" href="#" class="btn-option btn-mp3" target="_blank" download>3. Tải âm thanh [MP3]</a>
+        <a id="btnCover" href="#" class="btn-option btn-cover" target="_blank" download>4. Tải ảnh bìa</a>
       </div>
     </div>
-
-    <p class="note">
-      Hỗ trợ tải video Douyin và Kuaishou không logo nhanh chóng.
-    </p>
   </div>
-
-  <footer>Chinh Video Downloader · Hoạt động thực tế</footer>
+  <footer>Chinh Video Downloader</footer>
 </div>
 
 <script>
 function updateCount() {
   const text = document.getElementById("link").value;
-  document.getElementById("charCounter").textContent = `Bạn có thể nhập liên kết (${text.length}/500)`;
+  document.getElementById("charCounter").textContent = `Liên kết (${text.length}/500)`;
 }
 
 async function pasteLink() {
   try {
-    const text = await navigator.clipboard.readText();
-    document.getElementById("link").value = text;
+    document.getElementById("link").value = await navigator.clipboard.readText();
     updateCount();
   } catch (err) {
-    alert("Không thể dán tự động. Bạn hãy giữ tay vào ô nhập và chọn Dán nhé!");
+    alert("Hãy giữ tay vào ô nhập và chọn Dán nhé!");
   }
 }
 
@@ -294,50 +116,37 @@ async function analyze() {
   }
 
   const urlMatches = rawText.match(/https?:\/\/[^\s]+/g);
-  if (!urlMatches || urlMatches.length === 0) {
-    result.textContent = "Không tìm thấy liên kết hợp lệ trong nội dung bạn dán.";
+  if (!urlMatches) {
+    result.textContent = "Không tìm thấy URL hợp lệ trong nội dung.";
     return;
   }
 
-  const targetUrl = urlMatches[0];
-
   try {
-    result.textContent = "Đang kết nối qua máy chủ để lấy video thực tế...";
-
-    // Gọi đến máy chủ Functions thực tế ở bên trong Cloudflare Pages
-    const response = await fetch(`/api/download?url=${encodeURIComponent(targetUrl)}`);
+    result.textContent = "Đang kết nối máy chủ xử lý...";
+    const response = await fetch(`/api/download?url=${encodeURIComponent(urlMatches[0])}`);
     const data = await response.json();
 
+    // Hiển thị nguyên văn phản hồi từ server để debug
     if (data && data.code === 0 && data.data) {
-      const videoData = data.data;
+      const v = data.data;
+      document.getElementById("videoPlayer").src = v.hdplay || v.play;
+      document.getElementById("authorAvatar").src = v.author?.avatar || "";
+      document.getElementById("authorName").textContent = v.author?.nickname || "Tác giả";
+      document.getElementById("vTitle").textContent = v.title || "";
       
-      const hdUrl = videoData.hdplay || videoData.play;
-      const sdUrl = videoData.play || hdUrl;
-      const audioUrl = videoData.music;
-      const coverUrl = videoData.cover;
+      document.getElementById("btnHD").href = v.hdplay || v.play;
+      document.getElementById("btnSD").href = v.play;
+      document.getElementById("btnAudio").href = v.music;
+      document.getElementById("btnCover").href = v.cover;
 
-      // Đưa video thật vào khung phát
-      document.getElementById("videoPlayer").src = hdUrl;
-      
-      // Hiển thị thông tin tác giả thật
-      document.getElementById("authorAvatar").src = videoData.author?.avatar || "";
-      document.getElementById("authorName").textContent = videoData.author?.nickname || "Tác giả Douyin / Kuaishou";
-      document.getElementById("vTitle").textContent = videoData.title || "Video không có tiêu đề";
-      
-      // Gán đường dẫn thật vào đúng 4 nút tải xuống
-      document.getElementById("btnHD").href = hdUrl;
-      document.getElementById("btnSD").href = sdUrl;
-      document.getElementById("btnAudio").href = audioUrl;
-      document.getElementById("btnCover").href = coverUrl;
-
-      result.textContent = "Lấy video thành công và đã xóa logo!";
+      result.textContent = "Thành công!";
       infoBox.style.display = "block";
     } else {
-      result.textContent = "Không thể lấy thông tin video. Liên kết có thể không tồn tại hoặc đã bị xóa.";
+      // In ra lỗi chi tiết máy chủ trả về
+      result.textContent = "Lỗi API: " + JSON.stringify(data);
     }
-
   } catch (err) {
-    result.textContent = "Lỗi kết nối máy chủ xử lý. Bạn hãy thử lại sau ít phút!";
+    result.textContent = "Lỗi kết nối: " + err.message;
   }
 }
 </script>
