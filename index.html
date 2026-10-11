@@ -1,75 +1,58 @@
-import os
-import shutil
-import tempfile
-from pathlib import Path
-from urllib.parse import urlparse
-from urllib.request import urlopen
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0d1117">
+    <title>Chính TikTok Downloader</title>
 
-import yt_dlp
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from starlette.background import BackgroundTask
+    <style>
+        * { box-sizing: border-box; }
 
-app = FastAPI(title="Chinh Video API")
+        body {
+            background: #0d1117;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://chinh-video-downloader.pages.dev",
-        "http://localhost:3000",
-    ],
-    allow_credentials=False,
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
+        .container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 430px;
+        }
 
+        h1 {
+            text-align: center;
+            font-size: 23px;
+        }
 
-def check_url(url: str):
-    try:
-        parsed = urlparse(url)
-        host = (parsed.hostname or "").lower()
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
 
-        if parsed.scheme not in ("http", "https"):
-            raise ValueError()
+        textarea {
+            width: 100%;
+            min-height: 75px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-size: 15px;
+            resize: vertical;
+        }
 
-        if not (host == "tiktok.com" or host.endswith(".tiktok.com")):
-            raise ValueError()
-
-    except Exception:
-        raise HTTPException(
-            status_code=400,
-            detail="Vui lòng nhập liên kết TikTok hợp lệ."
-        )
-
-
-def get_video_info(url: str):
-    check_url(url)
-
-    options = {
-        "format": "best[ext=mp4]/best",
-        "quiet": True,
-        "no_warnings": True,
-        "noplaylist": True,
-        "socket_timeout": 25,
-        "http_headers": {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            ),
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-        },
-    }
-
-    try:
-        with yt_dlp.YoutubeDL(options) as ydl:
-            return ydl.extract_info(url, download=False)
-    except Exception as exc:
-        raise HTTPException(
-            status_code=502,
-            detail="Không lấy được thông tin video. Hãy thử lại sau."
-        ) from exc
-
-
-def download_video(url: str):
+        button, .download-btn {
+           
